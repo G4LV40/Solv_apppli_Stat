@@ -1,0 +1,35 @@
+dt1 <- read.table("T1-5_DAT.csv",sep=",", h=TRUE)
+x.4<-dt1[,4]
+x.5<-dt1[,5]
+
+ss<-c(var(x.4),cov(x.4,x.5),cov(x.4,x.5),var(x.5))
+S<-matrix(ss,2,2)  
+S.inv<-solve(S)
+
+xm<-c(x.4[1]-mean(x.4),x.5[1]-mean(x.5))
+dif.1_2<-matrix(xm,1,2)
+
+mj=(dif.1_2%*%S.inv%*%(t(dif.1_2)))
+
+#Laço
+n=length(x.4)
+
+dif.m<-matrix(0,n,2)
+mi<-matrix(0,n,1)
+
+for(i in 1:n){
+
+  dif.m[i,]<-c(x.4[i]-mean(x.4),x.5[i]-mean(x.5))
+  
+mi[i,]=(dif.m[i,]%*%S.inv%*%(dif.m[i,]))  
+            }
+
+# Os valores refrencias que estão abaixo do valor de qui-quadrado estão listados
+# a seguir: 
+X.square<-qchisq(0.5, df=2, ncp = 0, log = FALSE)
+
+#testando quais valores são maiores que a refrencia e portanto podem ser
+#considerado dentro de uma normal bivariada
+
+B.norm<-mi>X.square
+prop<-(length(mi[B.norm])/length(mi))
