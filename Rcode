@@ -1,25 +1,25 @@
 dt1 <- read.table("T1-5_DAT.csv",sep=",", h=TRUE)
-x.4<-dt1[,4]
-x.5<-dt1[,5]
+x5<-dt1[,5]
+x6<-dt1[,6]
 
-ss<-c(var(x.4),cov(x.4,x.5),cov(x.4,x.5),var(x.5))
+ss<-c(var(x5),cov(x5,x6),cov(x5,x6),var(x6))
 S<-matrix(ss,2,2)  
 S.inv<-solve(S)
 
-xm<-c(x.4[1]-mean(x.4),x.5[1]-mean(x.5))
+xm<-c(x5[1]-mean(x5),x6[1]-mean(x6))
 dif.1_2<-matrix(xm,1,2)
 
 mj=(dif.1_2%*%S.inv%*%(t(dif.1_2)))
 
 #Laço
-n=length(x.4)
+n=length(x5)
 
 dif.m<-matrix(0,n,2)
 mi<-matrix(0,n,1)
 
 for(i in 1:n){
 
-  dif.m[i,]<-c(x.4[i]-mean(x.4),x.5[i]-mean(x.5))
+  dif.m[i,]<-c(x5[i]-mean(x5),x6[i]-mean(x6))
   
 mi[i,]=(dif.m[i,]%*%S.inv%*%(dif.m[i,]))  
             }
@@ -33,3 +33,14 @@ X.square<-qchisq(0.5, df=2, ncp = 0, log = FALSE)
 
 B.norm<-mi>X.square
 prop<-(length(mi[B.norm])/length(mi))
+
+# Ou seja, 42% dos valores podem ser considerados de uma normal bivariada
+
+#Construindo um grafico de chi-square para as distancias estatísticas
+
+qqnorm(dif.m,main = "Normal Q-Q Plot",
+       xlab = "Theoretical Quantiles", ylab = "Sample Quantiles",
+       plot.it = TRUE, datax = FALSE)
+
+qqline(dif.m, datax = FALSE, distribution = qnorm,
+       probs = c(0.25, 0.75), qtype = 7)
